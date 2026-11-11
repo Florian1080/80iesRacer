@@ -1,0 +1,25 @@
+# Godot
+.godot/
+.import/
+*.translation
+export_credentials.cfg
+*.tmp
+
+# Builds
+build/
+*.apk
+*.aab
+*.ipa
+*.xcarchive
+
+# Android / iOS export helpers
+android/build/
+*.keystore
+!debug.keystore
+
+# macOS
+.DS_Store
+
+# Editoren
+.vscode/
+.idea/
