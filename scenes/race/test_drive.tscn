@@ -1,0 +1,74 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/game/test_drive.gd" id="1_drive"]
+[ext_resource type="Script" path="res://scripts/game/track.gd" id="2_track"]
+[ext_resource type="PackedScene" path="res://scenes/cars/car.tscn" id="3_car"]
+[ext_resource type="Script" path="res://scripts/game/follow_camera.gd" id="4_cam"]
+[ext_resource type="Script" path="res://scripts/ui/touch_controls.gd" id="5_touch"]
+
+[node name="TestDrive" type="Node2D"]
+script = ExtResource("1_drive")
+
+[node name="Track" type="Node2D" parent="."]
+script = ExtResource("2_track")
+
+[node name="Car" parent="." instance=ExtResource("3_car")]
+
+[node name="Camera" type="Camera2D" parent="."]
+process_callback = 0
+script = ExtResource("4_cam")
+
+[node name="Hud" type="CanvasLayer" parent="."]
+
+[node name="Speed" type="Label" parent="Hud"]
+unique_name_in_owner = true
+offset_left = 32.0
+offset_top = 24.0
+offset_right = 260.0
+offset_bottom = 80.0
+theme_override_colors/font_color = Color(0.95, 0.92, 0.84, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.1, 0.09, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 40
+text = "0 km/h"
+
+[node name="Hint" type="Label" parent="Hud"]
+unique_name_in_owner = true
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -420.0
+offset_top = 32.0
+offset_right = 420.0
+offset_bottom = 72.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.95, 0.92, 0.84, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.1, 0.09, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+
+[node name="MenuButton" type="Button" parent="Hud"]
+unique_name_in_owner = true
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -152.0
+offset_top = 24.0
+offset_right = -32.0
+offset_bottom = 72.0
+grow_horizontal = 0
+focus_mode = 0
+theme_override_font_sizes/font_size = 22
+text = "Menü"
+
+[node name="TouchControls" type="Control" parent="Hud"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("5_touch")

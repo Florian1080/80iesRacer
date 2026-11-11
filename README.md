@@ -3,7 +3,7 @@
 Top-Down-Rennspiel für das Handy im realistischen Retro-Look der 80er Jahre.
 Inspiriert von Rock n' Roll Racing: Rennen gegen Computer-Gegner, mit Item-Boxen und Spezial-Moves wie Mixtape-Turbo oder Ghettoblaster-Schallwelle.
 
-> Status: Projekt eingerichtet, Meilenstein 1 (Fahrphysik) als Nächstes.
+> Status: Meilenstein 1 in Arbeit. Testfahrt mit Fahrphysik, Drift und Touch-Steuerung ist spielbar.
 > Plan und Details: [docs/GAME_DESIGN.md](docs/GAME_DESIGN.md) · [docs/ROADMAP.md](docs/ROADMAP.md)
 
 ## Spielen
