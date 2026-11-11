@@ -36,6 +36,9 @@ const PX_PER_KMH := 5.0
 @export var grass_speed_factor := 0.45
 @export var grass_drag := 1.8
 @export var grass_grip_factor := 0.6
+@export var gravel_speed_factor := 0.3
+@export var gravel_drag := 3.2
+@export var gravel_grip_factor := 0.45
 
 @export_group("Aussehen")
 @export var body_color := Color("b5462f")
@@ -44,6 +47,8 @@ const PX_PER_KMH := 5.0
 var input := CarInput.new()
 ## Strecke, auf der das Auto fährt. Ohne Strecke gilt überall Asphalt.
 var track: Track
+var surface := Track.Surface.ROAD
+## Neben der Strecke (Gras oder Kies)?
 var on_grass := false
 var is_drifting := false
 ## Seitliches Rutschen in px/s, z. B. für Bremsspuren.
@@ -67,8 +72,9 @@ func _physics_process(delta: float) -> void:
 	var v_side := velocity.dot(right)
 	var speed := velocity.length()
 
-	on_grass = track != null and not track.is_on_road(global_position)
-	var top_speed := max_speed * (grass_speed_factor if on_grass else 1.0)
+	surface = track.get_surface(global_position) if track else Track.Surface.ROAD
+	on_grass = surface != Track.Surface.ROAD
+	var top_speed := max_speed * _surface_value(1.0, grass_speed_factor, gravel_speed_factor)
 
 	_steer = move_toward(_steer, input.steer, steer_response * delta)
 	_update_drift_state(speed, v_forward)
@@ -102,7 +108,7 @@ func _physics_process(delta: float) -> void:
 		_grip = target_grip
 	else:
 		_grip = move_toward(_grip, target_grip, grip_recovery * grip * delta)
-	var current_grip := _grip * (grass_grip_factor if on_grass else 1.0)
+	var current_grip := _grip * _surface_value(1.0, grass_grip_factor, gravel_grip_factor)
 	var speed_before := Vector2(v_forward, v_side).length()
 	v_side = lerpf(v_side, 0.0, clampf(current_grip * delta, 0.0, 1.0))
 	if is_drifting and not input.brake:
@@ -117,7 +123,7 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	if get_slide_collision_count() > 0:
 		velocity *= 0.96
-	_smoke.emitting = is_sliding() and not on_grass
+	_update_smoke()
 
 
 func get_speed_kmh() -> float:
@@ -161,7 +167,8 @@ func _apply_drive(v_forward: float, top_speed: float, delta: float) -> float:
 			return move_toward(v_forward, 0.0, brake_power * delta)
 		return move_toward(v_forward, -reverse_speed, acceleration * 0.6 * delta)
 	if v_forward > top_speed:
-		return move_toward(v_forward, top_speed, acceleration * grass_drag * delta)
+		var drag := _surface_value(1.0, grass_drag, gravel_drag)
+		return move_toward(v_forward, top_speed, acceleration * drag * delta)
 	var falloff := 1.0 - 0.6 * clampf(v_forward / max_speed, 0.0, 1.0)
 	return move_toward(v_forward, top_speed, acceleration * falloff * delta)
 
@@ -213,6 +220,27 @@ func _draw() -> void:
 	draw_line(Vector2(-33, -11), Vector2(-33, 11), chrome, 2.0)
 
 
+func _surface_value(road: float, grass: float, gravel: float) -> float:
+	match surface:
+		Track.Surface.GRASS:
+			return grass
+		Track.Surface.GRAVEL:
+			return gravel
+	return road
+
+
+## Reifenqualm auf Asphalt, Staubwolke im Kiesbett.
+func _update_smoke() -> void:
+	if surface == Track.Surface.GRAVEL:
+		_smoke.color = Color("cbb48a")
+		_smoke.emitting = velocity.length() > 120.0
+	elif surface == Track.Surface.ROAD:
+		_smoke.color = Color("dcd6cc")
+		_smoke.emitting = is_sliding()
+	else:
+		_smoke.emitting = false
+
+
 func _create_smoke() -> CPUParticles2D:
 	var smoke := CPUParticles2D.new()
 	smoke.emitting = false
@@ -235,8 +263,8 @@ func _create_smoke() -> CPUParticles2D:
 	grow.add_point(Vector2(1, 1.6))
 	smoke.scale_amount_curve = grow
 	var fade := Gradient.new()
-	fade.set_color(0, Color(0.86, 0.84, 0.8, 0.45))
-	fade.set_color(1, Color(0.86, 0.84, 0.8, 0.0))
+	fade.set_color(0, Color(1, 1, 1, 0.5))
+	fade.set_color(1, Color(1, 1, 1, 0.0))
 	smoke.color_ramp = fade
 	smoke.show_behind_parent = true
 	return smoke
