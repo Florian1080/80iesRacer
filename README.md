@@ -3,7 +3,8 @@
 Top-Down-Rennspiel für das Handy im realistischen Retro-Look der 80er Jahre.
 Inspiriert von Rock n' Roll Racing: Rennen gegen Computer-Gegner, mit Item-Boxen und Spezial-Moves wie Mixtape-Turbo oder Ghettoblaster-Schallwelle.
 
-> Status: Meilenstein 1 in Arbeit. Testfahrt mit Fahrphysik, Drift und Touch-Steuerung ist spielbar.
+> Status: Meilenstein 1 abgeschlossen (Fahrphysik, Drift, Touch-Steuerung). Als Nächstes: Meilenstein 2, die Rennstrecke.
+> Spielen: <https://florian1080.github.io/80iesRacer/>
 > Plan und Details: [docs/GAME_DESIGN.md](docs/GAME_DESIGN.md) · [docs/ROADMAP.md](docs/ROADMAP.md)
 
 ## Spielen

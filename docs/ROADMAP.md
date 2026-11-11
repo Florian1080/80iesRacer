@@ -6,12 +6,13 @@
 - [x] Spiel-Design-Dokument
 - [x] Automatischer Web-Build und Veröffentlichung über GitHub Actions
 
-## Meilenstein 1 – Fahren fühlt sich gut an
+## Meilenstein 1 – Fahren fühlt sich gut an ✅
 
-- [ ] Spielerauto mit Top-Down-Fahrphysik (Beschleunigung, Lenken, Driften)
-- [ ] Touch-Steuerung: Links/Rechts, Bremse, Auto-Gas
-- [ ] Kamera folgt dem Auto
-- [ ] Testfläche mit einfacher Strecke
+- [x] Spielerauto mit Top-Down-Fahrphysik (Beschleunigung, Lenken, Driften)
+- [x] Touch-Steuerung: Links/Rechts, Bremse, Auto-Gas
+- [x] Kamera folgt dem Auto
+- [x] Testfläche mit einfacher Strecke
+- [x] Drift mit Bremsspuren und Reifenqualm
 
 ## Meilenstein 2 – Die Rennstrecke
 
