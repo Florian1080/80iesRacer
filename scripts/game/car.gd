@@ -18,8 +18,21 @@ const PX_PER_KMH := 5.0
 
 @export_group("Lenkung")
 @export var turn_speed := 3.1
-@export var steer_response := 7.0
+## Wie schnell die Lenkung beim Halten zunimmt (pro Sekunde).
+@export var steer_rise := 5.5
+## Wie schnell sie beim Loslassen zurückgeht.
+@export var steer_fall := 10.0
+## Lenkkurve: >1 macht kleine Ausschläge feiner.
+@export var steer_curve := 1.5
+## Anteil der Lenkung, der bei Höchsttempo wegfällt.
+@export var high_speed_steer_loss := 0.3
 @export var grip := 9.0
+
+@export_group("Spurhilfe")
+## Richtet das Auto auf Geraden sanft an der Strecke aus, wenn nicht gelenkt wird.
+@export var steering_assist := true
+@export var assist_max_angle := 14.0
+@export var assist_rate := 1.1
 
 @export_group("Drift")
 @export var drift_grip := 2.4
@@ -76,7 +89,7 @@ func _physics_process(delta: float) -> void:
 	on_grass = surface != Track.Surface.ROAD
 	var top_speed := max_speed * _surface_value(1.0, grass_speed_factor, gravel_speed_factor)
 
-	_steer = move_toward(_steer, input.steer, steer_response * delta)
+	_update_steer(delta)
 	_update_drift_state(speed, v_forward)
 
 	v_forward = _apply_drive(v_forward, top_speed, delta)
@@ -87,10 +100,12 @@ func _physics_process(delta: float) -> void:
 	if is_drifting:
 		low_speed_factor = 1.0
 		direction = 1.0
-	var turn := turn_speed * (1.0 - 0.3 * speed_ratio)
+	var turn := turn_speed * (1.0 - high_speed_steer_loss * speed_ratio)
 	if is_drifting:
 		turn *= drift_turn_boost
-	rotation += _steer * turn * low_speed_factor * direction * delta
+	var steer_amount := signf(_steer) * pow(absf(_steer), steer_curve)
+	rotation += steer_amount * turn * low_speed_factor * direction * delta
+	_apply_assist(speed, delta)
 	if is_drifting and speed > 50.0:
 		# Im Drift dreht sich die Fahrtrichtung nicht mit der Nase mit.
 		# Die Nase darf höchstens max_drift_angle von der Fahrtrichtung abweichen.
@@ -148,6 +163,31 @@ func is_sliding() -> bool:
 ## Hinterräder in Weltkoordinaten, für Bremsspuren.
 func get_rear_wheels() -> PackedVector2Array:
 	return PackedVector2Array([to_global(Vector2(-19, -14)), to_global(Vector2(-19, 14))])
+
+
+func _update_steer(delta: float) -> void:
+	var target := input.steer
+	var rising := absf(target) > absf(_steer) and signf(target) == signf(_steer)
+	if is_zero_approx(_steer):
+		rising = not is_zero_approx(target)
+	# Richtungswechsel: erst schnell zurück zur Mitte, dann weich aufbauen
+	var rate := steer_rise if rising else steer_fall
+	_steer = move_toward(_steer, target, rate * delta)
+
+
+## Spurhilfe: auf Geraden, ohne Lenkeingabe und bei leichter Schräglage.
+func _apply_assist(speed: float, delta: float) -> void:
+	if not steering_assist or track == null or is_drifting:
+		return
+	if not is_zero_approx(input.steer) or speed < 200.0:
+		return
+	var i := track.nearest_index(global_position)
+	if track.is_curvy(i):
+		return
+	var diff := angle_difference(rotation, track.tangent_at(i).angle())
+	if absf(diff) > deg_to_rad(assist_max_angle):
+		return
+	rotation += clampf(diff, -assist_rate * delta, assist_rate * delta)
 
 
 func _update_drift_state(speed: float, v_forward: float) -> void:
