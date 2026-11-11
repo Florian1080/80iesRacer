@@ -3,6 +3,7 @@ extends Node2D
 
 @onready var _track: Track = $Track
 @onready var _car: Car = $Car
+@onready var _skid_marks: SkidMarks = $SkidMarks
 @onready var _camera: FollowCamera = $Camera
 @onready var _touch: Control = %TouchControls
 @onready var _speed: Label = %Speed
@@ -13,15 +14,16 @@ extends Node2D
 func _ready() -> void:
 	_car.track = _track
 	_car.place_at(_track.get_start_transform())
+	_skid_marks.track_car(_car)
 	_camera.target = _car
 	_camera.snap_to_target()
 	_touch.visible = DisplayServer.is_touchscreen_available()
 	if _touch.visible:
-		_hint.text = "Bremse + Lenken = Drift"
+		_hint.text = "Drift: beim Lenken kurz bremsen, dann Lenkung halten"
 	else:
-		_hint.text = "Pfeiltasten lenken · Leertaste bremst · Bremse + Lenken = Drift"
+		_hint.text = "Pfeiltasten lenken · Leertaste bremst · Drift: beim Lenken kurz bremsen"
 	_menu.pressed.connect(_back_to_menu)
-	get_tree().create_timer(6.0).timeout.connect(_hint.hide)
+	get_tree().create_timer(8.0).timeout.connect(_hint.hide)
 
 
 func _physics_process(_delta: float) -> void:

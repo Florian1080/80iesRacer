@@ -1,16 +1,20 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/game/test_drive.gd" id="1_drive"]
 [ext_resource type="Script" path="res://scripts/game/track.gd" id="2_track"]
 [ext_resource type="PackedScene" path="res://scenes/cars/car.tscn" id="3_car"]
 [ext_resource type="Script" path="res://scripts/game/follow_camera.gd" id="4_cam"]
 [ext_resource type="Script" path="res://scripts/ui/touch_controls.gd" id="5_touch"]
+[ext_resource type="Script" path="res://scripts/game/skid_marks.gd" id="6_skid"]
 
 [node name="TestDrive" type="Node2D"]
 script = ExtResource("1_drive")
 
 [node name="Track" type="Node2D" parent="."]
 script = ExtResource("2_track")
+
+[node name="SkidMarks" type="Node2D" parent="."]
+script = ExtResource("6_skid")
 
 [node name="Car" parent="." instance=ExtResource("3_car")]
 
